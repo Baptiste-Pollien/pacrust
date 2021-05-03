@@ -1,12 +1,17 @@
 use std::process;
 
-use pacrust::Maze;
+use pacrust::maze::Maze;
 
 fn main() {
     // initialize game
-    let file_name = String::from("maze01.txt");
+    pacrust::console::initialize()
+        .unwrap_or_else(|err| {
+            eprintln!("Unable to activate cbreak mode: {}", err);
+            process::exit(1);
+        });
 
     // load resources
+    let file_name = String::from("maze01.txt");
     let maze = Maze::load_maze(&file_name).unwrap_or_else(|err| {
         eprintln!("Problem loading maze: {}", err);
         process::exit(1);

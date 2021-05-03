@@ -1,6 +1,11 @@
 use std::process;
 
 use pacrust::maze::Maze;
+use pacrust::{
+    console,
+    console::Entry
+};
+use pacrust::maze::Position;
 
 fn main() {
     // initialize game
@@ -17,22 +22,32 @@ fn main() {
         process::exit(1);
     });
 
+    let mut cnt = 0;
+
     // game loop
     loop {
         // update screen
         maze.print_screen();
 
         // process input
+        let input = console::read_input();
+
+        if let Entry::Esc = input {
+            break
+        }
 
         // process movement
+        match input {
+            Entry::Up => println!("up"),
+            _ => println!("Other")
+        };
 
         // process collisions
 
         // check game over
 
-        // Temp: break infinite loop
-        break
-
         // repeat
+        cnt += 1;
+        println!("{}", cnt);
     }
 }

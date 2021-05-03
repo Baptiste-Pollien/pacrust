@@ -1,11 +1,13 @@
-use std::fs;
-use std::fmt;
 use std::{
-    io::{Error as IoError},
+    io::{Error as IoError,
+         ErrorKind},
     path::Path,
+    fmt,
+    fs,
+    ops::{Add, Sub},
 };
-use std::io::Error;
-use std::io::ErrorKind;
+
+use super::console;
 
 pub type IoRes<T> = Result<T, IoError>;
 
@@ -17,8 +19,8 @@ enum Tile {
 impl fmt::Display for Tile {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let new_char = match self {
-                    Tile::Wall => '█',
-                    _   => ' ',
+            Tile::Wall => '█',
+            _          => ' ',
         };
 
         write!(f, "{}", new_char)?;
@@ -27,31 +29,48 @@ impl fmt::Display for Tile {
     }
 }
 
-struct Position {
+pub struct Position {
     row: usize,
     col: usize
 }
 
+
+impl Add for Position {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {row: self.row + other.row, col: self.col + other.col}
+    }
+}
+
+impl Sub for Position {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {row: self.row - other.row, col: self.row - other.row}
+    }
+}
+
 struct Gum {
-    pos: Position,
+    pos:  Position,
     mega: bool
 }
 
 pub struct Maze {
-    map: Vec<Vec<Tile>>,
-    pacman: Position,
-    ghosts: Vec<Position>,
-    gums: Vec<Gum>,
-    width: usize,
-    heigth: usize,
+    map:     Vec<Vec<Tile>>,
+    pacman:  Position,
+    ghosts:  Vec<Position>,
+    gums:    Vec<Gum>,
+    width:   usize,
+    heigth:  usize,
     berserk: usize
 }
 
 impl Maze {
     pub fn load_maze(file: impl AsRef<Path>) -> IoRes<Maze> {
-        let contents = fs::read_to_string(file)?;
-        let mut ghosts: Vec<Position> = Vec::new();
-        let mut gums: Vec<Gum> = Vec::new();
+        let contents                     = fs::read_to_string(file)?;
+        let mut ghosts: Vec<Position>    = Vec::new();
+        let mut gums: Vec<Gum>           = Vec::new();
         let mut pacman: Option<Position> = None;
 
         let map: Vec<Vec<Tile>> = contents
@@ -106,13 +125,14 @@ impl Maze {
             })
         }
         else {
-            Err(Error::new(ErrorKind::Other, 
+            Err(IoError::new(ErrorKind::Other, 
                 "No player found"))
         }
 
     }
 
     pub fn print_screen(&self) {
+        //console::ansi::clear_screen();
         // Display maze
         for line in &self.map {
             for c in line {

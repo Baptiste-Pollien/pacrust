@@ -44,19 +44,31 @@ pub fn read_input() -> Entry {
         process::exit(1)
     };
 
-    let stdout = io::stdout();
-    let mut reader = io::stdin();
-    let mut buffer = [0;1];  // read exactly one byte
-    stdout.lock().flush().unwrap_or_else(handle_error);
-    reader.read_exact(&mut buffer).unwrap_or_else(handle_error);
-    println!("{:#x}", buffer[0]);
-    match buffer[0] {
-        0x41 => Entry::Up,
-        0x42 => Entry::Down,
-        0x43 => Entry::Rigth,
-        0x44 => Entry::Left,
-        0x1b => Entry::Esc,
-        _    => Entry::None
+    let mut buffer = [0; 3];
+    let cnt = io::stdin()
+                    .read(&mut buffer)
+                    .unwrap_or_else(handle_error);
+
+    if cnt == 1 && buffer[0] == 0x1b{
+        Entry::Esc
+    }
+    else if cnt >= 3 {
+        if buffer[0] == 0x1b && buffer[1] == 0x5b {
+            match buffer[2] {
+                0x41 => Entry::Up,
+                0x42 => Entry::Down,
+                0x43 => Entry::Rigth,
+                0x44 => Entry::Left,
+                0x1b => Entry::Esc,
+                _    => Entry::None
+            }
+        }
+        else {
+            Entry::None
+        }
+    }
+    else {
+        Entry::None
     }
 
 }

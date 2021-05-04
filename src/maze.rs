@@ -132,7 +132,7 @@ impl Maze {
     }
 
     pub fn print_screen(&self) {
-        //console::ansi::clear_screen();
+        console::ansi::clear_screen();
         // Display maze
         for line in &self.map {
             for c in line {

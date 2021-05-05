@@ -83,3 +83,17 @@ pub mod ansi {
         print!("\x1b[{};{}H", row + 1, col + 1)
     }
 }
+
+pub mod graphic {
+    pub fn display_sprit(character: char) -> char {
+        match character {
+            '#' => '█',
+            '.' => '◦',
+            'P' => '☺',
+            'G' => '☠',
+            '-' => '▔',
+            'X' => '♥',
+            _   => character,
+        }
+    }
+}

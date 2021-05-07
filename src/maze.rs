@@ -58,6 +58,14 @@ impl Position {
     pub fn new(row: usize, col: usize) -> Position {
         Position{row, col}
     }
+
+    pub fn get_row(&self) -> usize {
+        self.row
+    }
+
+    pub fn get_col(&self) -> usize {
+        self.col
+    }
 }
 
 struct Gum {
@@ -149,8 +157,11 @@ impl Maze {
         }
     }
 
-    fn make_move(&self, dir: console::Entry) -> Position {
-        let mut pos = Position::new(self.pacman.row, self.pacman.col);
+    fn make_move(&self, 
+                 current_pos: Position,
+                 dir: &console::Entry
+    ) -> Position {
+        let mut pos = Position::new(current_pos.row, current_pos.col);
 
         match dir {
             console::Entry::Up => {
@@ -188,15 +199,21 @@ impl Maze {
             _ => (),
         }
         if self.get_tile(pos.row, pos.col) == Tile::Wall {
-            self.pacman
+            current_pos
         }
         else {
             pos
         }
     }
 
-    pub fn move_player(&mut self, dir: console::Entry) {
-        self.pacman = self.make_move(dir);
+    pub fn move_player(&mut self, dir: &console::Entry) {
+        self.pacman = self.make_move(self.pacman, &dir);
+    }
+
+    pub fn move_ghosts(&mut self) {
+        self.ghosts = self.ghosts.iter().map(|pos| -> Position {
+            self.make_move(*pos, &console::Entry::rand_dir())
+        }).collect();
     }
 
     pub fn print_screen(&self) {
@@ -209,10 +226,19 @@ impl Maze {
             println!("")
         }
 
+        // Display gums
+        self.gums.iter().for_each(|gum| {
+            let c = if gum.mega {'X'} else {'.'};
+            console::display_at_pos(&gum.pos, c);
+        });
+
+        // Display ghosts
+        self.ghosts.iter().for_each(|pos| {
+            console::display_at_pos(&pos, 'G');
+        });
+
         // Display player
-        let pos_pac = &self.pacman;
-        console::ansi::move_cursor(pos_pac.row, pos_pac.col);
-        print!("{}", display_sprit('P'));
+        console::display_at_pos(&self.pacman, 'P');
 
         //reset cursor
         console::ansi::move_cursor(self.heigth-1, self.width);

@@ -30,16 +30,15 @@ fn main() {
         // process input
         let input = console::read_input();
 
-        if let Entry::Esc = input {
-            break
-        }
-
         // process movement
-        maze.move_player(input);
-
+        maze.move_player(&input);
+        maze.move_ghosts();
         // process collisions
 
         // check game over
+        if let Entry::Esc = input {
+            break
+        }
 
         // repeat
     }

@@ -3,9 +3,24 @@ use termios::*;
 use std::io;
 use std::os::unix::io::AsRawFd;
 use std::io::Read;
-use std::io::Write;
+use rand::Rng;
+
+use super::maze;
 
 pub enum Entry {Esc, Up, Down, Left, Rigth, None}
+
+impl Entry {
+    pub fn rand_dir() -> Entry {
+        let rand_number = rand::thread_rng().gen_range(1..5);
+
+        match rand_number {
+            1 => Entry::Up,
+            2 => Entry::Down,
+            3 => Entry::Rigth,
+            _ => Entry::Left
+        }
+    }
+}
 
 pub struct ConsoleMode;
 
@@ -71,6 +86,11 @@ pub fn read_input() -> Entry {
         Entry::None
     }
 
+}
+
+pub fn display_at_pos(pos: &maze::Position, character: char) {
+    ansi::move_cursor(pos.get_row(), pos.get_col());
+    print!("{}", graphic::display_sprit(character));
 }
 
 pub mod ansi {

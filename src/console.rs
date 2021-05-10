@@ -3,23 +3,20 @@ use termios::*;
 use std::io;
 use std::os::unix::io::AsRawFd;
 use std::io::Read;
-use rand::Rng;
+use rand_derive2::RandGen;
 
 use super::maze;
 
-pub enum Entry {Esc, Up, Down, Left, Rigth, None}
-
-impl Entry {
-    pub fn rand_dir() -> Entry {
-        let rand_number = rand::thread_rng().gen_range(1..5);
-
-        match rand_number {
-            1 => Entry::Up,
-            2 => Entry::Down,
-            3 => Entry::Rigth,
-            _ => Entry::Left
-        }
-    }
+#[derive(PartialEq, RandGen)]
+pub enum Entry {
+    #[rand_derive(skip)]
+    Esc,
+    Up,
+    Down,
+    Left,
+    Right,
+    #[rand_derive(skip)]
+    None
 }
 
 pub struct ConsoleMode;
@@ -72,7 +69,7 @@ pub fn read_input() -> Entry {
             match buffer[2] {
                 0x41 => Entry::Up,
                 0x42 => Entry::Down,
-                0x43 => Entry::Rigth,
+                0x43 => Entry::Right,
                 0x44 => Entry::Left,
                 0x1b => Entry::Esc,
                 _    => Entry::None

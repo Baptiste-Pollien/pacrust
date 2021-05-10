@@ -6,9 +6,28 @@ use pacrust::{
     console::Entry
 };
 
+use structopt::StructOpt;
+
+/// PacMan game coded in rust.
+/// From https://github.com/danicat/pacgo
+#[derive(StructOpt)]
+#[structopt(name="PacRust")]
+struct Cli {
+    /// Enable graphical user interface
+    #[structopt(long, short)]
+    graphic: bool,
+
+    /// Display the game in the console
+    #[structopt(long, short)]
+    console: bool,
+}
+
+
 use piston_window::*;
 
 fn main() {
+    let args = Cli::from_args();
+
     // initialize game
     pacrust::console::initialize()
         .unwrap_or_else(|err| {

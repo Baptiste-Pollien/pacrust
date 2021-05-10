@@ -31,7 +31,7 @@ impl fmt::Display for Tile {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Position {
     row: usize,
     col: usize
@@ -80,7 +80,9 @@ pub struct Maze {
     gums:    Vec<Gum>,
     width:   usize,
     heigth:  usize,
-    berserk: usize
+    berserk: usize,
+    lives: u8,
+    max_gums: usize,
 }
 
 impl Maze {
@@ -127,8 +129,9 @@ impl Maze {
                     }).collect()
             }).collect();
 
-        let heigth = map.len();
-        let width = map[0].len();
+        let heigth   = map.len();
+        let width    = map[0].len();
+        let max_gums = gums.len();
 
         if let Some(pacman) = pacman {
             Ok(Maze {
@@ -138,7 +141,9 @@ impl Maze {
                 gums,
                 width,
                 heigth,
-                berserk: 0
+                berserk: 0,
+                lives: 1,
+                max_gums,
             })
         }
         else {
@@ -155,6 +160,14 @@ impl Maze {
         else {
             Tile::Wall
         }
+    }
+
+    pub fn get_nb_gums(&self) -> usize {
+        self.gums.len()
+    }
+
+    pub fn get_lives(&self) -> u8 {
+        self.lives
     }
 
     fn make_move(&self, 
@@ -180,7 +193,7 @@ impl Maze {
                     pos.row = pos.row + 1;
                 }
             },
-            console::Entry::Rigth => {
+            console::Entry::Right => {
                 if pos.col == self.width - 1 {
                     pos.col = 0;
                 }
@@ -207,13 +220,27 @@ impl Maze {
     }
 
     pub fn move_player(&mut self, dir: &console::Entry) {
-        self.pacman = self.make_move(self.pacman, &dir);
+        let player = self.make_move(self.pacman, &dir);
+
+        self.pacman = player;
+
+        self.gums.retain(|gum| -> bool{
+            gum.pos != player
+        });
     }
 
     pub fn move_ghosts(&mut self) {
         self.ghosts = self.ghosts.iter().map(|pos| -> Position {
-            self.make_move(*pos, &console::Entry::rand_dir())
+            self.make_move(*pos, &console::Entry::generate_random())
         }).collect();
+    }
+
+    pub fn process_collisions(&mut self) {
+        for pos_ghost in self.ghosts.iter() {
+            if self.pacman == *pos_ghost {
+                self.lives = 0;
+            }
+        }
     }
 
     pub fn print_screen(&self) {
@@ -242,6 +269,8 @@ impl Maze {
 
         //reset cursor
         console::ansi::move_cursor(self.heigth-1, self.width);
-        println!("");
+
+        // Print score
+        println!("\nScore: {} \tLives: {}", self.max_gums as usize - self.gums.len(), self.lives);
     }
 }

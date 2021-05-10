@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 termios = "0.3.3"
 rand = "0.8.3"
+rand_derive2 = "0.1.16"
+piston_window = "*"

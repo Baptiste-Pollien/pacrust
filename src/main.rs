@@ -5,7 +5,8 @@ use pacrust::{
     console,
     console::Entry
 };
-use pacrust::maze::Position;
+
+use piston_window::*;
 
 fn main() {
     // initialize game
@@ -33,13 +34,27 @@ fn main() {
         // process movement
         maze.move_player(&input);
         maze.move_ghosts();
+
         // process collisions
+        maze.process_collisions();
 
         // check game over
-        if let Entry::Esc = input {
+        if Entry::Esc == input 
+           || maze.get_nb_gums() == 0 
+           || maze.get_lives() == 0 {
             break
         }
 
         // repeat
     }
+
+    maze.print_screen();
+    if maze.get_nb_gums() == 0 {
+        println!("You win !");
+    }
+    else if maze.get_lives() == 0 {
+        println!("You die...");
+    }
 }
+
+

@@ -1,9 +1,11 @@
-use std::process;
 use termios::*;
-use std::io;
-use std::os::unix::io::AsRawFd;
-use std::io::Read;
 use rand_derive2::RandGen;
+use std::{
+    io,
+    io::Read,
+    process,
+    os::unix::io::AsRawFd,
+};
 
 use super::maze;
 
@@ -85,11 +87,6 @@ pub fn read_input() -> Entry {
 
 }
 
-pub fn display_at_pos(pos: &maze::Position, character: char) {
-    ansi::move_cursor(pos.get_row(), pos.get_col());
-    print!("{}", graphic::display_sprit(character));
-}
-
 pub mod ansi {
     pub fn clear_screen() {
         print!("\x1b[2J");
@@ -99,6 +96,11 @@ pub mod ansi {
     pub fn move_cursor(row: usize, col: usize) {
         print!("\x1b[{};{}H", row + 1, col + 1)
     }
+}
+
+pub fn display_at_pos(pos: &maze::Position, character: char) {
+    ansi::move_cursor(pos.get_row(), pos.get_col());
+    print!("{}", graphic::display_sprit(character));
 }
 
 pub mod graphic {

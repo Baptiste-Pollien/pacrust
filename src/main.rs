@@ -1,15 +1,15 @@
 use std::process;
-
-use pacrust::maze::Maze;
-use pacrust::{
-    console,
-    console::Entry
-};
-
 use structopt::StructOpt;
 
+use pacrust::{
+    console,
+    console::Entry,
+    maze::Maze,
+};
+
+
 /// PacMan game coded in rust.
-/// From https://github.com/danicat/pacgo
+/// Based on https://github.com/danicat/pacgo
 #[derive(StructOpt)]
 #[structopt(name="PacRust")]
 struct Cli {
@@ -17,16 +17,22 @@ struct Cli {
     #[structopt(long, short)]
     graphic: bool,
 
-    /// Display the game in the console
-    #[structopt(long, short)]
-    console: bool,
+    /// Specify the input file for the maze
+    #[structopt(long="--maze-file",
+                short="-m",
+                default_value="maze01.txt")]
+    maze_file: String,
 }
 
-
-use piston_window::*;
+// use piston_window::*;
 
 fn main() {
+    // Read command line arguments
     let args = Cli::from_args();
+
+    if args.graphic {
+        println!("[WARNING] GUI not available for now...")
+    }
 
     // initialize game
     pacrust::console::initialize()
@@ -36,7 +42,7 @@ fn main() {
         });
 
     // load resources
-    let file_name = String::from("maze01.txt");
+    let file_name = String::from(args.maze_file);
     let mut maze = Maze::load_maze(&file_name).unwrap_or_else(|err| {
         eprintln!("Problem loading maze: {}", err);
         process::exit(1);
@@ -67,12 +73,13 @@ fn main() {
         // repeat
     }
 
-    maze.print_screen();
+    // End of the game
+    console::ansi::clear_screen();
     if maze.get_nb_gums() == 0 {
-        println!("You win !");
+        println!("You won!");
     }
     else if maze.get_lives() == 0 {
-        println!("You die...");
+        println!("You died...");
     }
 }
 

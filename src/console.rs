@@ -21,6 +21,10 @@ pub enum Entry {
     None
 }
 
+impl Default for Entry {
+    fn default() -> Self { Entry::None }
+}
+
 pub struct ConsoleMode;
 
 impl Drop for ConsoleMode {
@@ -58,7 +62,7 @@ pub fn read_input() -> Entry {
         process::exit(1)
     };
 
-    let mut buffer = [0; 3];
+    let mut buffer = [0; 102];
     let cnt = io::stdin()
                     .read(&mut buffer)
                     .unwrap_or_else(handle_error);

@@ -1,5 +1,8 @@
 use std::process;
 use structopt::StructOpt;
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
 
 use pacrust::{
     console,
@@ -48,13 +51,26 @@ fn main() {
         process::exit(1);
     });
 
+    // process input (async)
+    let (tx, rx) = mpsc::sync_channel(0);
+    thread::spawn(move || {
+        loop {
+            let input = console::read_input();
+
+            if let Err(_) = tx.send(input) {
+                break
+            };
+        }
+    });
+
+
     // game loop
     loop {
         // update screen
         maze.print_screen();
 
         // process input
-        let input = console::read_input();
+        let input = rx.try_recv().unwrap_or_default();
 
         // process movement
         maze.move_player(&input);
@@ -71,6 +87,7 @@ fn main() {
         }
 
         // repeat
+        thread::sleep(Duration::from_millis(50));
     }
 
     // End of the game

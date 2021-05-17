@@ -12,7 +12,7 @@ use super::console::graphic::display_sprit;
 
 pub type IoRes<T> = Result<T, IoError>;
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(PartialEq, Debug)]
 enum Tile {
     Wall,
     Space
@@ -31,7 +31,11 @@ impl fmt::Display for Tile {
     }
 }
 
-#[derive(Copy, Clone, PartialEq)]
+impl Default for Tile {
+    fn default() -> Self { Tile::Wall }
+}
+
+#[derive(PartialEq)]
 pub struct Position {
     row: usize,
     col: usize
@@ -153,12 +157,12 @@ impl Maze {
 
     }
 
-    fn get_tile(&self, row:usize, col:usize) -> Tile {
+    fn get_tile(&self, row:usize, col:usize) -> Option<&Tile> {
         if row < self.heigth && col < self.width {
-            self.map[row][col]
+            Some(&self.map[row][col])
         }
         else {
-            Tile::Wall
+            None
         }
     }
 
@@ -171,7 +175,7 @@ impl Maze {
     }
 
     fn make_move(&self, 
-                 current_pos: Position,
+                 current_pos: &Position,
                  dir: &console::Entry
     ) -> Position {
         let mut pos = Position::new(current_pos.row, current_pos.col);
@@ -211,35 +215,51 @@ impl Maze {
             }
             _ => (),
         }
-        if self.get_tile(pos.row, pos.col) == Tile::Wall {
-            current_pos
+
+        if let Some(tile) = self.get_tile(pos.row, pos.col) {
+            if *tile == Tile::Wall {
+                pos.row = current_pos.row;
+                pos.col = current_pos.col;
+            }
         }
-        else {
-            pos
-        }
+
+        pos
     }
 
     pub fn move_player(&mut self, dir: &console::Entry) {
-        let player = self.make_move(self.pacman, &dir);
+        let player = self.make_move(&self.pacman, &dir);
 
         self.pacman = player;
 
-        self.gums.retain(|gum| -> bool{
-            gum.pos != player
-        });
+        for i in 0..self.gums.len() {
+            if self.gums[i].pos == self.pacman {
+                self.gums.remove(i);
+                break;
+            }
+        }
     }
 
     pub fn move_ghosts(&mut self) {
-        self.ghosts = self.ghosts.iter().map(|pos| -> Position {
-            self.make_move(*pos, &console::Entry::generate_random())
+        self.ghosts = self.ghosts
+                          .iter()
+                          .map(|pos| -> Position {
+            let mut new_pos;
+            loop {
+                new_pos = self.make_move(pos, &console::Entry::generate_random());
+
+                if new_pos != *pos {
+                    break
+                }
+            }
+            new_pos
         }).collect();
     }
 
     pub fn process_collisions(&mut self) {
-        for pos_ghost in self.ghosts.iter() {
-            if self.pacman == *pos_ghost {
-                self.lives = 0;
-            }
+        if let Some(_) = self.ghosts.iter().find(|&ghost| {
+            *ghost == self.pacman
+        }){
+            self.lives = self.lives - 1;
         }
     }
 

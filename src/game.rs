@@ -2,83 +2,27 @@ use std::{
     io::{Error as IoError,
          ErrorKind},
     path::Path,
-    fmt,
     fs,
-    ops::{Add, Sub},
 };
-
 use super::console;
-use super::console::graphic::display_sprit;
 
 pub type IoRes<T> = Result<T, IoError>;
 
-#[derive(PartialEq, Debug)]
-enum Tile {
-    Wall,
-    Space
-}
+/// Structure and functions to interact with the positions of elements of
+/// the game.
+pub mod position;
+use self::position::Position;
 
-impl fmt::Display for Tile {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let new_char = match self {
-            Tile::Wall => display_sprit('#'),
-            _          => display_sprit(' '),
-        };
-
-        write!(f, "{}", new_char)?;
-
-        fmt::Result::Ok(())
-    }
-}
-
-impl Default for Tile {
-    fn default() -> Self { Tile::Wall }
-}
-
-#[derive(PartialEq)]
-pub struct Position {
-    row: usize,
-    col: usize
-}
-
-
-impl Add for Position {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self {
-        Self {row: self.row + other.row, col: self.col + other.col}
-    }
-}
-
-impl Sub for Position {
-    type Output = Self;
-
-    fn sub(self, other: Self) -> Self {
-        Self {row: self.row - other.row, col: self.row - other.row}
-    }
-}
-
-impl Position {
-    pub fn new(row: usize, col: usize) -> Position {
-        Position{row, col}
-    }
-
-    pub fn get_row(&self) -> usize {
-        self.row
-    }
-
-    pub fn get_col(&self) -> usize {
-        self.col
-    }
-}
+mod tile;
+pub use self::tile::Tile;
 
 struct Gum {
     pos:  Position,
     mega: bool
 }
 
-pub struct Maze {
-    map:     Vec<Vec<Tile>>,
+pub struct Game {
+    maze:     Vec<Vec<Tile>>,
     pacman:  Position,
     ghosts:  Vec<Position>,
     gums:    Vec<Gum>,
@@ -89,14 +33,14 @@ pub struct Maze {
     max_gums: usize,
 }
 
-impl Maze {
-    pub fn load_maze(file: impl AsRef<Path>) -> IoRes<Maze> {
+impl Game {
+    pub fn load_maze(file: impl AsRef<Path>) -> IoRes<Game> {
         let contents                     = fs::read_to_string(file)?;
         let mut ghosts: Vec<Position>    = Vec::new();
         let mut gums: Vec<Gum>           = Vec::new();
         let mut pacman: Option<Position> = None;
 
-        let map: Vec<Vec<Tile>> = contents
+        let maze: Vec<Vec<Tile>> = contents
             .lines()
             .enumerate()
             .map(|(row, line)| {
@@ -133,13 +77,13 @@ impl Maze {
                     }).collect()
             }).collect();
 
-        let heigth   = map.len();
-        let width    = map[0].len();
+        let heigth   = maze.len();
+        let width    = maze[0].len();
         let max_gums = gums.len();
 
         if let Some(pacman) = pacman {
-            Ok(Maze {
-                map,
+            Ok(Game {
+                maze,
                 pacman,
                 ghosts,
                 gums,
@@ -159,7 +103,7 @@ impl Maze {
 
     fn get_tile(&self, row:usize, col:usize) -> Option<&Tile> {
         if row < self.heigth && col < self.width {
-            Some(&self.map[row][col])
+            Some(&self.maze[row][col])
         }
         else {
             None
@@ -266,7 +210,7 @@ impl Maze {
     pub fn print_screen(&self) {
         console::ansi::clear_screen();
         // Display maze
-        for line in &self.map {
+        for line in &self.maze {
             for c in line {
                 print!("{}", c)
             }

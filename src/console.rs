@@ -7,7 +7,7 @@ use std::{
     os::unix::io::AsRawFd,
 };
 
-use super::maze;
+use super::game::position as game;
 
 #[derive(PartialEq, RandGen)]
 pub enum Entry {
@@ -102,7 +102,7 @@ pub mod ansi {
     }
 }
 
-pub fn display_at_pos(pos: &maze::Position, character: char) {
+pub fn display_at_pos(pos: &game::Position, character: char) {
     ansi::move_cursor(pos.get_row(), pos.get_col());
     print!("{}", graphic::display_sprit(character));
 }

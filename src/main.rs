@@ -6,8 +6,7 @@ use std::time::Duration;
 
 use pacrust::{
     console,
-    console::Entry,
-    maze::Maze,
+    game::Game,
 };
 
 
@@ -46,7 +45,7 @@ fn main() {
 
     // load resources
     let file_name = String::from(args.maze_file);
-    let mut maze = Maze::load_maze(&file_name).unwrap_or_else(|err| {
+    let mut game = Game::load_maze(&file_name).unwrap_or_else(|err| {
         eprintln!("Problem loading maze: {}", err);
         process::exit(1);
     });
@@ -67,22 +66,22 @@ fn main() {
     // game loop
     loop {
         // update screen
-        maze.print_screen();
+        game.print_screen();
 
         // process input
         let input = rx.try_recv().unwrap_or_default();
 
         // process movement
-        maze.move_player(&input);
-        maze.move_ghosts();
+        game.move_player(&input);
+        game.move_ghosts();
 
         // process collisions
-        maze.process_collisions();
+        game.process_collisions();
 
         // check game over
-        if Entry::Esc == input 
-           || maze.get_nb_gums() == 0 
-           || maze.get_lives() == 0 {
+        if console::Entry::Esc == input 
+           || game.get_nb_gums() == 0 
+           || game.get_lives() == 0 {
             break
         }
 
@@ -92,10 +91,10 @@ fn main() {
 
     // End of the game
     console::ansi::clear_screen();
-    if maze.get_nb_gums() == 0 {
+    if game.get_nb_gums() == 0 {
         println!("You won!");
     }
-    else if maze.get_lives() == 0 {
+    else if game.get_lives() == 0 {
         println!("You died...");
     }
 }

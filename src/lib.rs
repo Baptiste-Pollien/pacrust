@@ -6,5 +6,6 @@
 /// - move the cursor to draw in the console
 pub mod console;
 
-/// Module to interact with the maze
-pub mod maze;
+/// Module to interact with the game
+pub mod game;
+

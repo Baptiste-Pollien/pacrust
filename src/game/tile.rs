@@ -1,6 +1,7 @@
 use std::fmt;
 use super::console::graphic;
 
+/// Possible static elements of the maze
 #[derive(PartialEq, Debug)]
 pub enum Tile {
     Wall,

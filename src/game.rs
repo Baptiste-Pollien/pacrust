@@ -8,11 +8,12 @@ use super::console;
 
 pub type IoRes<T> = Result<T, IoError>;
 
-/// Structure and functions to interact with the positions of elements of
+/// Structure and functions to interact with the position of elements of
 /// the game.
 pub mod position;
 use self::position::Position;
 
+/// Enum for static elements of the maze
 mod tile;
 pub use self::tile::Tile;
 
@@ -116,6 +117,14 @@ impl Game {
 
     pub fn get_lives(&self) -> u8 {
         self.lives
+    }
+
+    pub fn get_max_gums(&self) -> usize {
+        self.max_gums
+    }
+
+    pub fn get_score(&self) -> usize {
+        self.max_gums as usize - self.gums.len()
     }
 
     fn make_move(&self, 
@@ -231,10 +240,10 @@ impl Game {
         // Display player
         console::display_at_pos(&self.pacman, 'P');
 
-        //reset cursor
+        // Reset cursor
         console::ansi::move_cursor(self.heigth-1, self.width);
 
         // Print score
-        println!("\nScore: {} \tLives: {}", self.max_gums as usize - self.gums.len(), self.lives);
+        println!("\nScore: {} \tLives: {}", self.get_score(), self.lives);
     }
 }

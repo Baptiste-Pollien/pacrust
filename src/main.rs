@@ -92,10 +92,12 @@ fn main() {
     // End of the game
     console::ansi::clear_screen();
     if game.get_nb_gums() == 0 {
-        println!("You won!");
+        println!("You have won!");
     }
     else if game.get_lives() == 0 {
-        println!("You died...");
+        println!("Game over... ({}/{})", 
+                        game.get_score(), 
+                        game.get_max_gums());
     }
 }
 

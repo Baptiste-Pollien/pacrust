@@ -52,7 +52,6 @@ impl Add for Position {
 ///
 /// ```
 /// # use pacrust::game::position::Position;
-/// 
 /// let pos1 = Position::new(2, 2);
 /// let pos2 = Position::new(1, 1);
 /// let res  = pos1 - pos2;

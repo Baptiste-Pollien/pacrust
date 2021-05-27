@@ -3,9 +3,11 @@
 /// - Function to enable cooked console mode
 /// - Read input from the keyboard
 /// - Display the sprite
-/// - move the cursor to draw in the console
+/// - Move the cursor to draw in the console
 pub mod console;
 
-/// Module to interact with the game
+/// Module that manage the game
+/// - Define a structure to store the information of the game
+/// - Define functions to update the game (move the player, the ghosts...)
 pub mod game;
 

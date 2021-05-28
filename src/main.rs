@@ -62,6 +62,19 @@ fn main() {
         }
     });
 
+    // process for ghosts
+    let ghosts = game.get_clone_ghosts();
+    let maze   = game.get_clone_maze();
+    thread::spawn(move || {
+        // Waiting before starting moving ghosts
+        thread::sleep(Duration::from_millis(50));
+        loop {
+            ghosts.move_ghosts(&maze);
+
+            thread::sleep(Duration::from_millis(200));
+        };
+    });
+
 
     // game loop
     loop {
@@ -73,7 +86,6 @@ fn main() {
 
         // process movement
         game.move_player(&input);
-        game.move_ghosts();
 
         // process collisions
         game.process_collisions();

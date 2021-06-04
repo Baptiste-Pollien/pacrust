@@ -11,11 +11,11 @@ pub enum Tile {
 impl fmt::Display for Tile {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let new_char = match self {
-            Tile::Wall => graphic::display_sprit('#'),
-            _          => graphic::display_sprit(' '),
+            Tile::Wall => '#',
+            _          => ' ',
         };
 
-        write!(f, "{}", new_char)?;
+        write!(f, "{}", graphic::display_sprit(new_char))?;
 
         fmt::Result::Ok(())
     }

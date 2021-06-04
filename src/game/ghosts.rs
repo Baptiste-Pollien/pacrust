@@ -60,7 +60,7 @@ impl Ghosts {
     pub fn display_ghosts(&self) {
         let ghosts = self.list.lock().unwrap();
         ghosts.iter().for_each(|pos| {
-             console::display_at_pos(&pos, 'G');
+             console::display_at_pos_small(&pos, 'G');
         });
     }
 }

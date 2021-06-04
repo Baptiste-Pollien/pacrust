@@ -170,18 +170,19 @@ impl Game {
         console::ansi::clear_screen();
         // Display maze
         self.maze.display_maze();
+        console::ansi::move_cursor(1, 1);
 
         // Display gums
         self.gums.iter().for_each(|gum| {
             let c = if gum.mega {'X'} else {'.'};
-            console::display_at_pos(&gum.pos, c);
+            console::display_at_pos_small(&gum.pos, c);
         });
 
         // Display ghosts
         self.ghosts.display_ghosts();
 
         // Display player
-        console::display_at_pos(&self.pacman, 'P');
+        console::display_at_pos_small(&self.pacman, 'P');
 
         // Reset cursor
         console::ansi::move_cursor(self.heigth-1, self.width);

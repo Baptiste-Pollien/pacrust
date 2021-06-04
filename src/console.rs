@@ -102,21 +102,32 @@ pub mod ansi {
     }
 }
 
+/// Display the character at the given position
+/// Must be used for walls that use 2 console characters
 pub fn display_at_pos(pos: &game::Position, character: char) {
-    ansi::move_cursor(pos.get_row(), pos.get_col());
+    ansi::move_cursor(pos.get_row(), pos.get_col() + 1);
     print!("{}", graphic::display_sprit(character));
 }
 
+/// Display the character every two columns
+/// Must be used for small sprit (other than the wall)
+pub fn display_at_pos_small(pos: &game::Position, character: char) {
+    ansi::move_cursor(pos.get_row(), pos.get_col() * 2);
+    print!("{}", graphic::display_sprit(character));
+}
+
+
 pub mod graphic {
-    pub fn display_sprit(character: char) -> char {
+    pub fn display_sprit(character: char) -> &'static str {
         match character {
-            '#' => '█',
-            '.' => '◦',
-            'P' => '☺',
-            'G' => '☠',
-            '-' => '▔',
-            'X' => '♥',
-            _   => character,
+            '#' => "🧱",
+            '.' => "▫️ ",
+            'P' => "😃",
+            'G' => "👻",
+            '-' => "  ",
+            'X' => "💊",
+            ' ' => "  ",
+            _   => "ERROR",
         }
     }
 }
